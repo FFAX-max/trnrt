@@ -761,8 +761,8 @@ def add_generation_config_arg(ap: argparse.ArgumentParser) -> None:
         "--generation-config",
         choices=("auto", "none"),
         default="auto",
-        help="where the sampling defaults come from: auto, the checkpoint's generation_config.json (the default, as in "
-        "vLLM); none, the server's built-in defaults (temperature 1.0, top_p 1.0), whatever the checkpoint holds",
+        help="where the sampling defaults come from: auto, the checkpoint's generation_config.json (the default); none, "
+        "the server's built-in defaults (temperature 1.0, top_p 1.0), whatever the checkpoint holds",
     )
 
 
