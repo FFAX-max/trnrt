@@ -839,7 +839,7 @@ def generation_defaults(model_path: str | None) -> dict[str, float]:
     GLM-5.3-Flash's (eb9eb208) sets temperature 1.0 and top_p 0.95, so a
     request without top_p sampled the whole candidate set at top_p 1.0. A value of the wrong type or out of range is
     left out (the server's own default stands) and logged; no file, no defaults. Its max_new_tokens, a positive
-    integer, comes back too: the most a request that sets no token limit may generate (_params), as in vLLM."""
+    integer, comes back too: the most a request that sets no token limit may generate (_params)."""
     if not model_path:
         return {}
     path = os.path.join(model_path, "generation_config.json")

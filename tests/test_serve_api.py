@@ -676,6 +676,20 @@ def test_the_checkpoints_max_new_tokens_caps_a_request_without_a_token_limit(ser
     assert max_new({"max_new_tokens": 32}, text, "/v1/completions") == 16  # the completions default is the smaller
     assert max_new({"max_new_tokens": 8}, {**text, "max_tokens": 20}, "/v1/completions") == 20
 
+    d = tmp_path / "info"
+    d.mkdir()
+    (d / "generation_config.json").write_text(json.dumps({"max_new_tokens": 4, "temperature": 0.6}))
+    for kw, want_max, want_info in (({}, 4, {"temperature": 0.6}), ({"generation_config": "none"}, room, None)):
+        eng = ScriptedEngine(PLAIN)
+        eng.model_path = str(d)
+        with TestClient(api.build_app(eng, "glm", **kw)) as c:
+            assert c.post("/v1/chat/completions", json=chat).status_code == 200
+            # /model_info gives sampling defaults only: a client sending max_new_tokens back would set a limit
+            assert c.get("/model_info").json()["preferred_sampling_params"] == want_info
+        for lp in [lp for lp in api._LOOPS if lp.engine is eng]:
+            lp.stop()
+        assert eng.added[-1].params.max_new_tokens == want_max  # none drops the cap with the other defaults
+
 
 def test_generation_config_none_keeps_the_servers_sampling_defaults(tmp_path):
     """--generation-config none: a checkpoint's generation_config.json sets no default (temperature and top_p stay
